@@ -1,4 +1,5 @@
-from setuptools import find_packages
+from setuptools import setup, find_packages
+from os.path import join, dirname
 
 __here__ = dirname(__file__)
 with open(join(__here__,'README.md')) as f:
