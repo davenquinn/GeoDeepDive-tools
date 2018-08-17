@@ -25,26 +25,50 @@ from this repository using
 
 ## Usage
 
-```
+```python
 from GDDTools import Sentence
 
 # An object extracted from a row in the `sentences_nlp352` data table
 obj = dict(
-  index=0,
-  words=['Hello',',','World','!'],
-  lemmas=['hello',',','world','!'],
-  poses=['UH',',','NN','.'],
-  ners=['O','O','O','O'],
-  dep_parent=[...]
-  # `word_idx` array can be provided but is not used (it is redundant)
+    index=0,
+    words=['Hello',',','World','!'],
+    lemmas=['hello',',','world','!'],
+    poses=['UH',',','NN','.'],
+    ners=['O','O','O','O'],
+    dep_parent=[...]
+    # `word_idx` array can be provided but is not used (it is redundant)
 )
 
 sentence = Sentence(obj)
 print(sentence) # -> "Hello, world!"
 
 sentence.word[0].is_noun # -> False
-
+sentence.word[1].previous().lemma # hello
 ```
+
+Using `sqlalchemy` table reflection, data can be loaded simply into an object with the requisite
+keys, so that setup is quite terse:
+
+```python
+from sqlalchemy import create_engine, MetaData, Table
+from sqlalchemy.orm.session import sessionmaker
+
+engine = create_engine("postgresql:///GeoDeepDive-test")
+meta=MetaData(bind=engine.connect())
+nlp = Table("test_sentences_nlp352", meta, autoload=True)
+
+for row in nlp:
+    sentence = Sentence(row)
+
+    for word in sentence:
+        if word.lemma not in ['rock','star']:
+            continue
+        print(word)
+```
+
+The [ignimbrites test application](https://github.com/davenquinn/app-template) is based
+around a slightly more intricate implementation of this pattern, and shows some examples
+of using the API.
 
 ## Contributing
 
