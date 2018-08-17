@@ -53,11 +53,13 @@ keys, so that setup is quite terse:
 from sqlalchemy import create_engine, MetaData, Table
 from sqlalchemy.orm.session import sessionmaker
 
+# SQLAlchemy ORM setup
 engine = create_engine("postgresql:///GeoDeepDive-test")
-meta=MetaData(bind=engine.connect())
+meta=MetaData(bind=engine)
 nlp = Table("test_sentences_nlp352", meta, autoload=True)
+session = sessionmaker(bind=engine)()
 
-for row in nlp:
+for row in session.query(nlp):
     sentence = Sentence(row)
 
     for word in sentence:
